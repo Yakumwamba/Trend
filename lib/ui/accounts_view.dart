@@ -81,6 +81,7 @@ class _AccountViewState extends State<AccountView> {
                 gradient: LinearGradient(
                     begin: Alignment.bottomCenter,
                     end: Alignment.topCenter,
+                    
                     colors: [
                       Color(0xFFf79f00),
                       Color(0XFFe54f4f),

@@ -27,11 +27,11 @@ class _LoginScreen extends State<LoginScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn googleSignIn = GoogleSignIn();
   GetStorage box = GetStorage();
-  bool _visible_login;
-  bool _visible_signup;
-  bool _visible_logo;
-  bool _back;
-  bool _email_login;
+  bool _visible_login = false;
+  bool _visible_signup = false;
+  bool _visible_logo = false;
+  bool _back = false;
+  bool _email_login = false;
   bool isInitialized = false;
   // TODO 5: Override the initState() method and setup your VideoPlayerController
   @override
@@ -225,7 +225,7 @@ class _LoginScreen extends State<LoginScreen> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Visibility(
-                        visible: _back,
+                        visible: _back != null ? _back : false,
                         child: Padding(
                           padding: EdgeInsets.only(top: 40.0),
                           child: Container(
@@ -241,13 +241,20 @@ class _LoginScreen extends State<LoginScreen> {
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               Visibility(
-                                  visible: _email_login,
+                                  visible: _email_login != false
+                                      ? _email_login
+                                      : false,
                                   child: EmailLoginWidget()),
                               Visibility(
-                                  visible: _visible_signup,
+                                  visible: _visible_signup != false
+                                      ? _visible_signup
+                                      : false,
                                   child: EmailSignUpWidget()),
                               Visibility(
-                                visible: !_back && !_visible_signup,
+                                visible: (!_back != false? _back : false) &&
+                                    (_visible_signup != false
+                                        ? _visible_signup
+                                        : false),
                                 child: InkWell(
                                   onTap: () {
                                     continueWithSignup();
