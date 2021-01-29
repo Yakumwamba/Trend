@@ -1,5 +1,8 @@
+import 'dart:ui';
+
 import 'package:Trend/signupWidget.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import 'package:video_player/video_player.dart';
 
@@ -10,8 +13,9 @@ class SignUpScreen extends StatefulWidget {
   _SignUpScreenState createState() => _SignUpScreenState();
 }
 
-class _SignUpScreenState extends State<SignUpScreen> {
-// TODO 5: Override the initState() method and setup your VideoPlayerController
+class _SignUpScreenState extends State<SignUpScreen>
+    with WidgetsBindingObserver {
+  double _overlap = 0.0;
   @override
   void initState() {
     super.initState();
@@ -19,36 +23,40 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   @override
+  void didChangeMetrics() {
+    super.didChangeMetrics();
+
+    final renderObject = context.findRenderObject();
+    final renderBox = renderObject as RenderBox;
+    final offset = renderBox.localToGlobal(Offset.zero);
+    final widgetRect = Rect.fromLTWH(
+      offset.dx,
+      offset.dy,
+      renderBox.size.width,
+      renderBox.size.height,
+    );
+
+    final keyBoardTopPixel =
+        window.physicalSize.height - window.viewInsets.bottom;
+    final keyBoardTopPoint = keyBoardTopPixel / window.devicePixelRatio;
+    final overlap = widgetRect.bottom - keyBoardTopPoint;
+
+    if (overlap >= 0) {
+      setState(() {
+        _overlap = overlap;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      resizeToAvoidBottomInset: false,
-      // TODO 6: Create a Stack Widget
-      body: Stack(
-        children: <Widget>[
-          // TODO 7: Add a SizedBox to contain our video.
-
-          Center(
-            child: Container(
-              padding:
-                  EdgeInsets.only(bottom: 20, top: 70, left: 30, right: 30),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomLeft,
-                    colors: [Color(0xFFf79f00), Color(0XFFe54f4f)]),
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  EmailSignUpWidget()
-                  ],
-              ),
-            ),
-          )
-        ],
-      ),
-    );
+        resizeToAvoidBottomInset: false,
+        resizeToAvoidBottomPadding: true,
+        body: Padding(
+          padding: EdgeInsets.only(bottom: _overlap),
+          child: Center(child: EmailLoginWidget()),
+        ));
   }
 
   // TODO 8: Override the dipose() method to cleanup the video controller.

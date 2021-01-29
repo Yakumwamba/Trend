@@ -46,10 +46,7 @@ class MyApp extends StatelessWidget {
                     fit: BoxFit.cover,
                     child: SizedBox(
                       height: Get.height,
-                      child: Lottie.asset(
-                        'assets/json/Trend-Splash-Animation.json',
-                        fit: BoxFit.cover,
-                      ),
+                      child: Text("splash image")
                     ),
                   ),
                 ),

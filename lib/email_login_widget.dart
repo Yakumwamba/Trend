@@ -14,11 +14,6 @@ import 'package:get/state_manager.dart';
 import 'package:get_storage/get_storage.dart';
 //import 'package:get_storage/get_storage.dart';
 
-import 'dart:convert' as convert;
-import 'package:http/http.dart' as http;
-
-import 'custom_web_view.dart';
-
 class EmailLoginWidget extends StatefulWidget {
   const EmailLoginWidget({
     Key key,
@@ -74,24 +69,32 @@ class _EmailLoginWidgetState extends State<EmailLoginWidget> {
   }
 
   void _login() async {
-    final User user = (await _auth.signInWithEmailAndPassword(
-      email: _emailController.text,
-      password: _passwordController.text,
-    ))
-        .user;
+    //catch execptions
+    try {
+      final User user = (await _auth.signInWithEmailAndPassword(
+        email: _emailController.text,
+        password: _passwordController.text,
+      ))
+          .user;
 
-    if (user != null) {
-      box.write('logged_in', 'true');
-      box.write('email', user.email);
-      box.write("loggin_type", "EMAIL");
-      box.write("userId", user.uid);
+      if (user != null) {
+        box.write("logged_in", true);
+        box.write('email', user.email);
+        box.write('username', 'Howard');
+        box.write("loggin_type", "EMAIL");
+        box.write("userId", user.uid);
 
-      if (box.read("ts_agreed") != null && box.read("ts_agreed") == true) {
-        Get.to(TrendHome());
+        if (box.read("ts_agreed") != null && box.read("ts_agreed") == true) {
+          Get.to(TrendHome());
+        } else {
+          Get.to(TermsAndConditions());
+        }
       } else {
-        Get.to(TermsAndConditions());
+        Get.snackbar("Error", "Something went wrong, try again");
       }
-    } else {}
+    } catch (e) {
+      Get.log(e.toString());
+    }
   }
 
   @override
@@ -110,17 +113,6 @@ class _EmailLoginWidgetState extends State<EmailLoginWidget> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Center(
-                        child: Padding(
-                      padding: const EdgeInsets.only(bottom: 60.0),
-                      child: Text(
-                        "Login",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 33,
-                            color: Colors.white),
-                      ),
-                    )),
                     SizedBox(height: 10),
                     Container(
                       height: 50,
@@ -132,21 +124,13 @@ class _EmailLoginWidgetState extends State<EmailLoginWidget> {
                         child: TextFormField(
                           controller: _emailController,
                           decoration: InputDecoration(
-                              icon: Padding(
-                                padding: const EdgeInsets.only(left: 10.0),
-                                child: Icon(
-                                  TrendIcons.email_icon,
-                                  size: 20,
-                                  color: Colors.orange,
-                                ),
-                              ),
                               fillColor: Colors.white,
                               filled: true,
                               border: InputBorder.none,
                               hintText: 'Insert email',
                               hintStyle: TextStyle(fontSize: 15),
                               contentPadding:
-                                  EdgeInsets.only(left: 60, bottom: 15)),
+                                  EdgeInsets.only(left: 10, bottom: 15)),
                           validator: (String value) {
                             if (value.isEmpty) {
                               return 'Please enter a valid email';
@@ -168,22 +152,13 @@ class _EmailLoginWidgetState extends State<EmailLoginWidget> {
                           controller: _passwordController,
                           obscureText: true,
                           decoration: InputDecoration(
-                              icon: Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 10.0, bottom: 15),
-                                child: Icon(
-                                  TrendIcons.lock,
-                                  size: 27,
-                                  color: Colors.orange,
-                                ),
-                              ),
                               fillColor: Colors.white,
                               filled: true,
                               border: InputBorder.none,
                               hintText: 'Insert password',
                               hintStyle: TextStyle(fontSize: 15),
                               contentPadding:
-                                  EdgeInsets.only(left: 45, bottom: 15)),
+                                  EdgeInsets.only(left: 10, bottom: 15)),
                           validator: (String value) {
                             if (value.isEmpty) {
                               return 'Please enter some text';
@@ -198,7 +173,11 @@ class _EmailLoginWidgetState extends State<EmailLoginWidget> {
                       height: 50,
                       decoration: BoxDecoration(
                           color: Color(0xfff79f00),
-                          borderRadius: BorderRadius.all(Radius.circular(6))),
+                          borderRadius: BorderRadius.all(Radius.circular(6)),
+                          gradient: LinearGradient(
+                              colors: [Color(0xfff15a24), Color(0xffed1e79)],
+                              begin: Alignment.bottomLeft,
+                              end: Alignment.topRight)),
                       child: InkWell(
                         onTap: () async {
                           if (_formKey.currentState.validate()) {
@@ -210,40 +189,15 @@ class _EmailLoginWidgetState extends State<EmailLoginWidget> {
                         },
                         child: Center(
                             child: Text(
-                          "Submit",
+                          "Login",
                           style: TextStyle(
-                              color: Color(0xff262626),
+                              color: Colors.white,
                               fontSize: 16,
                               fontWeight: FontWeight.bold),
                         )),
                       ),
                     ),
                     SizedBox(height: 8),
-                    Center(
-                        // child: InkWell(
-                        //   onTap: () {
-                        //     Get.to(SignUpScreen());
-                        //   },
-                        //   child: Container(
-                        //     width: 150,
-                        //     child: Column(
-                        //       children: [
-                        //         Opacity(
-                        //           opacity: 0.6,
-                        //           child: Text(
-                        //             "Create an account",
-                        //             style: TextStyle(
-                        //                 fontSize: 14,
-                        //                 fontWeight: FontWeight.bold,
-                        //                 color: Colors.white),
-                        //             textAlign: TextAlign.center,
-                        //           ),
-                        //         ),
-                        //       ],
-                        //     ),
-                        //   ),
-                        // ),
-                        ),
                   ],
                 ),
               ),

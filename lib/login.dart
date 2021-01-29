@@ -22,23 +22,24 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreen extends State<LoginScreen> {
-  // TODO 4: Create a VideoPlayerController object.
   VideoPlayerController _controller;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GoogleSignIn googleSignIn = GoogleSignIn();
+  // final GoogleSignIn googleSignIn = GoogleSignIn();
   GetStorage box = GetStorage();
-  bool _visible_login = false;
-  bool _visible_signup = false;
-  bool _visible_logo = false;
-  bool _back = false;
-  bool _email_login = false;
+
+  bool _emailLogin = false;
   bool isInitialized = false;
-  // TODO 5: Override the initState() method and setup your VideoPlayerController
+  bool _signUp = false;
+  bool _continueWithEmail = true;
+
+  // TODO 5: Override- the initState() method and setup your VideoPlayerController
   @override
   void initState() {
     super.initState();
+    bool _signUp = false;
+    _continueWithEmail = true;
     // Pointing the video controller to our local asset.
-    Get.log("${box.read("logged_in")}");
+    Get.log("user is not logged in ${box.read("logged_in")}");
     if (box.read("logged_in") != null && box.read("logged_in") == true) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         // Add Your Code here.
@@ -63,96 +64,6 @@ class _LoginScreen extends State<LoginScreen> {
               // Ensure the first frame is shown after the video is initialized.
             });
     }
-
-    _visible_signup = false;
-    _email_login = false;
-    _back = true;
-  }
-
-  void continueWithEmail() {
-    setState(() {
-      _back = false;
-      _email_login = true;
-      _visible_signup = false;
-    });
-  }
-
-  back() {
-    setState(() {
-      _email_login = false;
-      _visible_signup = false;
-      _back = true;
-    });
-  }
-
-  void continueWithSignup() {
-    setState(() {
-      _email_login = false;
-      _visible_signup = true;
-      _back = false;
-    });
-  }
-
-  Future<String> signInWithGoogle() async {
-    //await Firebase.initializeApp();
-
-    //_controller.dispose();
-    if (box.read("logged_in") == "true" && box.read("ts_agreed") == true) {
-      Get.to(TrendHome()).then((value) {
-        _controller.dispose();
-      });
-    } else {
-      final GoogleSignInAccount googleSignInAccount =
-          await googleSignIn.signIn();
-      final GoogleSignInAuthentication googleSignInAuthentication =
-          await googleSignInAccount.authentication;
-
-      final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleSignInAuthentication.accessToken,
-        idToken: googleSignInAuthentication.idToken,
-      );
-
-      final UserCredential authResult =
-          await _auth.signInWithCredential(credential);
-      final User user = authResult.user;
-
-      if (user != null) {
-        assert(!user.isAnonymous);
-        assert(await user.getIdToken() != null);
-
-        var firstname = user.displayName.split(" ")[0];
-        var lastname = user.displayName.split(" ")[1];
-        var email = user.email;
-        var photoUrl = user.photoURL;
-        var userId = user.uid;
-        box.write("username", user.displayName);
-        box.write("firstname", firstname);
-        box.write("lastname", lastname);
-        box.write("logged_in", true);
-        box.write("email", email);
-        box.write("photoUrl", photoUrl);
-        box.write("loggin_type", "GOOGLE");
-        box.write("userId", userId);
-
-        final User currentUser = _auth.currentUser;
-        assert(user.uid == currentUser.uid);
-
-        Widget trendHomeOrTermsAndConditions =
-            box.read("ts_agreed") != null && box.read("ts_agreed") == true
-                ? TrendHome()
-                : TermsAndConditions();
-        print('signInWithGoogle succeeded: $user');
-        Navigator.of(context)
-            .push(Transitions.createRoute(trendHomeOrTermsAndConditions))
-            .then((value) {
-          _controller.dispose();
-        });
-
-        return '$user';
-      }
-
-      return null;
-    }
   }
 
   @override
@@ -164,205 +75,156 @@ class _LoginScreen extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
+
     return WillPopScope(
         onWillPop: () async {
           setState(() {
-            _email_login = false;
-            _visible_signup = false;
-            _back = true;
+            _signUp = false;
+            _continueWithEmail = true;
+            _emailLogin = false;
+            //_back = true;
           });
           return false;
         },
-        child: new Scaffold(
-          resizeToAvoidBottomPadding: false,
+        child: Scaffold(
+          resizeToAvoidBottomPadding: true,
+          resizeToAvoidBottomInset: true,
           // TODO 6: Create a Stack Widget
           body: Stack(
             children: <Widget>[
               // TODO 7: Add a SizedBox to contain our video.
 
-              Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                        begin: Alignment.bottomCenter,
-                        end: Alignment.topCenter,
-                        colors: [
-                          Color(0xFFf79f00),
-                          Color(0XFFe54f4f),
-                        ]),
-                  ),
-                  child: Builder(builder: (BuildContext context) {
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      // Add Your Code here.
-
-                      setState(() {
-                        //_controller.play();
-                      });
-                    });
-                    return SizedBox.expand(
-                      child: FittedBox(
-                          // If your background video doesn't look right, try changing the BoxFit property.
-                          // BoxFit.fill created the look I was going for.
-                          fit: BoxFit.fill,
-                          child: SizedBox(
-                            width: isInitialized
-                                ? _controller.value.size?.width ?? 0
-                                : 0,
-                            height: isInitialized
-                                ? _controller.value.size?.height ?? 0
-                                : 0,
-                            child: isInitialized
-                                ? VideoPlayer(_controller)
-                                : Container(),
-                          )),
-                    );
-                  })),
-              Center(
+              Positioned(
                 child: Container(
-                  padding:
-                      EdgeInsets.only(bottom: 20, top: 70, left: 30, right: 30),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.bottomCenter,
+                          end: Alignment.topCenter,
+                          colors: [
+                            Color(0xFFf79f00),
+                            Color(0XFFe54f4f),
+                          ]),
+                    ),
+                    child: Builder(builder: (BuildContext context) {
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        // Add Your Code here.
+
+                        setState(() {
+                          //_controller.play();
+                        });
+                      });
+                      return SizedBox.expand(
+                        child: FittedBox(
+                            // If your background video doesn't look right, try changing the BoxFit property.
+                            // BoxFit.fill created the look I was going for.
+                            fit: BoxFit.fill,
+                            child: SizedBox(
+                              width: isInitialized
+                                  ? _controller.value.size?.width ?? 0
+                                  : 0,
+                              height: isInitialized
+                                  ? _controller.value.size?.height ?? 0
+                                  : 0,
+                              child: isInitialized
+                                  ? VideoPlayer(_controller)
+                                  : Container(),
+                            )),
+                      );
+                    })),
+              ),
+
+              Align(
+                alignment: Alignment.topCenter,
+                child: SizedBox(
+                  child: Container(
+                      child: Image.asset(
+                    'assets/logo/logo.png',
+                    fit: BoxFit.fill,
+                    width: 250,
+                  )),
+                ),
+              ),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: Container(
+                  width: Get.width,
+                  height: 350,
+                  padding: EdgeInsets.all(20),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       Visibility(
-                        visible: _back != null ? _back : false,
-                        child: Padding(
-                          padding: EdgeInsets.only(top: 40.0),
+                          visible: !_continueWithEmail && !_signUp,
+                          child: EmailLoginWidget()),
+                      Visibility(
+                          visible: !_continueWithEmail && _signUp,
+                          child: EmailSignUpWidget()),
+
+                      // // Visibility(
+                      // //     visible: !_back && !_visible_signup,
+                      // //     child: SizedBox(
+                      // //       height: 65,
+                      // //     )),
+                      Visibility(
+                        visible: _continueWithEmail && !_emailLogin,
+                        child: InkWell(
+                          onTap: () {
+                            setState(() {
+                              _continueWithEmail = false;
+
+                              _signUp = false;
+                            });
+                            //continueWithEmail();
+                          },
                           child: Container(
-                              height: 150,
-                              width: 220,
-                              child: Image.asset('assets/logo/logo_white.png')),
-                        ),
-                      ),
-                      SingleChildScrollView(
-                        child: Container(
-                          alignment: Alignment.center,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              Visibility(
-                                  visible: _email_login != false
-                                      ? _email_login
-                                      : false,
-                                  child: EmailLoginWidget()),
-                              Visibility(
-                                  visible: _visible_signup != false
-                                      ? _visible_signup
-                                      : false,
-                                  child: EmailSignUpWidget()),
-                              Visibility(
-                                visible: (!_back != false? _back : false) &&
-                                    (_visible_signup != false
-                                        ? _visible_signup
-                                        : false),
-                                child: InkWell(
-                                  onTap: () {
-                                    continueWithSignup();
-                                  },
-                                  child: Container(
-                                    child: Center(
-                                      child: Text(
-                                        "Create account",
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                    ),
-                                  ),
-                                ),
+                            height: 52,
+                            decoration: BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(7)),
+                              color: Colors.white,
+                              boxShadow: [],
+                            ),
+                            child: Center(
+                              child: Text(
+                                "Login with email",
+                                style: TextStyle(fontSize: 20),
                               ),
-                              Visibility(
-                                  visible: !_back && !_visible_signup,
-                                  child: SizedBox(
-                                    height: 65,
-                                  )),
-                              Visibility(
-                                visible: _back,
-                                child: InkWell(
-                                  onTap: () {
-                                    continueWithEmail();
-                                  },
-                                  child: Container(
-                                    height: 52,
-                                    decoration: BoxDecoration(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(7)),
-                                      color: Colors.white,
-                                      boxShadow: [],
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        Padding(
-                                          padding: EdgeInsets.only(
-                                              left: 14, right: 30),
-                                          child: Icon(
-                                            TrendIcons.email_icon,
-                                            size: 15,
-                                            color: Colors.orange,
-                                          ),
-                                        ),
-                                        Text(
-                                          "Continue with Email",
-                                          style: TextStyle(fontSize: 20),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(height: 10),
-                              Visibility(
-                                visible: _back,
-                                child: Container(
-                                    height: 50,
-                                    child: GoogleSignInButton(
-                                        textStyle: TextStyle(
-                                            fontWeight: FontWeight.normal,
-                                            fontSize: 20),
-                                        onPressed: () async {
-                                          signInWithGoogle();
-                                        },
-                                        borderRadius: 8.0)),
-                              ),
-                              SizedBox(height: 30),
-                              Visibility(
-                                visible: _back,
-                                child: Center(
-                                  child: Container(
-                                    width: 150,
-                                    child: Column(
-                                      children: [
-                                        Opacity(
-                                          opacity: 0.4,
-                                          child: Text(
-                                            "By continuing you agree with our",
-                                            style: TextStyle(
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.normal,
-                                                color: Colors.white),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        ),
-                                        Opacity(
-                                          opacity: 0.6,
-                                          child: Text(
-                                            "Terms and Conditions",
-                                            style: TextStyle(
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
                         ),
-                      )
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Visibility(
+                        visible: _continueWithEmail,
+                        child: InkWell(
+                          onTap: () {
+                            setState(() {
+                              _continueWithEmail = false;
+                              _emailLogin = false;
+                              _signUp = true;
+                            });
+                            //continueWithEmail();
+                          },
+                          child: Container(
+                            height: 52,
+                            decoration: BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(7)),
+                              color: Colors.white,
+                              boxShadow: [],
+                            ),
+                            child: Center(
+                              child: Text(
+                                "Sign up",
+                                style: TextStyle(fontSize: 20),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -373,3 +235,65 @@ class _LoginScreen extends State<LoginScreen> {
   }
 }
 // TODO 8: Override the dipose() method to cleanup the video controlle
+
+// Future<String> signInWithGoogle() async {
+//   //await Firebase.initializeApp();
+
+//   //_controller.dispose();
+//   if (box.read("logged_in") == "true" && box.read("ts_agreed") == true) {
+//     Get.to(TrendHome()).then((value) {
+//       _controller.dispose();
+//     });
+//   } else {
+//     final GoogleSignInAccount googleSignInAccount =
+//         await googleSignIn.signIn();
+//     final GoogleSignInAuthentication googleSignInAuthentication =
+//         await googleSignInAccount.authentication;
+
+//     final AuthCredential credential = GoogleAuthProvider.credential(
+//       accessToken: googleSignInAuthentication.accessToken,
+//       idToken: googleSignInAuthentication.idToken,
+//     );
+
+//     final UserCredential authResult =
+//         await _auth.signInWithCredential(credential);
+//     final User user = authResult.user;
+
+//     if (user != null) {
+//       assert(!user.isAnonymous);
+//       assert(await user.getIdToken() != null);
+
+//       var firstname = user.displayName.split(" ")[0];
+//       var lastname = user.displayName.split(" ")[1];
+//       var email = user.email;
+//       var photoUrl = user.photoURL;
+//       var userId = user.uid;
+//       box.write("username", user.displayName);
+//       box.write("firstname", firstname);
+//       box.write("lastname", lastname);
+//       box.write("logged_in", true);
+//       box.write("email", email);
+//       box.write("photoUrl", photoUrl);
+//       box.write("loggin_type", "GOOGLE");
+//       box.write("userId", userId);
+
+//       final User currentUser = _auth.currentUser;
+//       assert(user.uid == currentUser.uid);
+
+//       Widget trendHomeOrTermsAndConditions =
+//           box.read("ts_agreed") != null && box.read("ts_agreed") == true
+//               ? TrendHome()
+//               : TermsAndConditions();
+//       print('signInWithGoogle succeeded: $user');
+//       Navigator.of(context)
+//           .push(Transitions.createRoute(trendHomeOrTermsAndConditions))
+//           .then((value) {
+//         _controller.dispose();
+//       });
+
+//       return '$user';
+//     }
+
+//     return null;
+//   }
+// }
