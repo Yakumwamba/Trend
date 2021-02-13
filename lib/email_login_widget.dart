@@ -38,18 +38,14 @@ class _EmailLoginWidgetState extends State<EmailLoginWidget> {
 
   final TextEditingController _passwordController = TextEditingController();
 
-  bool _success;
-  String _userEmail;
-  var LOGIN_SCREEN = 1;
-  var REGISTER_SCREEN = 2;
-  var CURRENT_SCREEN = 0;
+  bool _loading = false;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     print(box.read("logged_in"));
-    var CURRENT_SCREEN = 0;
+    _loading = false;
   }
 // @override
 // void initState() {
@@ -68,7 +64,7 @@ class _EmailLoginWidgetState extends State<EmailLoginWidget> {
     // box.dispose();
   }
 
-  void _login() async {
+  Future<void> _login() async {
     //catch execptions
     try {
       final User user = (await _auth.signInWithEmailAndPassword(
@@ -80,12 +76,12 @@ class _EmailLoginWidgetState extends State<EmailLoginWidget> {
       if (user != null) {
         box.write("logged_in", true);
         box.write('email', user.email);
-        box.write('username', 'Howard');
+        box.write("username", user.displayName);
         box.write("loggin_type", "EMAIL");
         box.write("userId", user.uid);
 
         if (box.read("ts_agreed") != null && box.read("ts_agreed") == true) {
-          Get.to(TrendHome());
+          Get.to(App());
         } else {
           Get.to(TermsAndConditions());
         }
@@ -99,7 +95,7 @@ class _EmailLoginWidgetState extends State<EmailLoginWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
+    return _loading ?  Center(child: CircularProgressIndicator())  : SingleChildScrollView(
       child: Padding(
         padding: EdgeInsets.only(bottom: 8.0),
         child: Column(
@@ -181,7 +177,14 @@ class _EmailLoginWidgetState extends State<EmailLoginWidget> {
                       child: InkWell(
                         onTap: () async {
                           if (_formKey.currentState.validate()) {
-                            _login();
+                            setState(() {
+                              _loading = true;
+                            });
+                            _login().then((value) {
+                              setState(() {
+                                _loading = false;
+                              });
+                            });
                             return;
                           }
                           Get.snackbar(

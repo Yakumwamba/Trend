@@ -6,22 +6,21 @@ import 'package:Trend/trend_icons_icons.dart';
 import 'package:Trend/ui/transitions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_auth_buttons/flutter_auth_buttons.dart';
+
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 
 import 'package:video_player/video_player.dart';
 
-class LoginScreen extends StatefulWidget {
-  LoginScreen({Key key}) : super(key: key);
+class LoginScreenx extends StatefulWidget {
+  LoginScreenx({Key key}) : super(key: key);
   @override
-  _LoginScreen createState() => _LoginScreen();
+  _LoginScreenx createState() => _LoginScreenx();
 }
 
-class _LoginScreen extends State<LoginScreen> {
+class _LoginScreenx extends State<LoginScreenx> {
   VideoPlayerController _controller;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   // final GoogleSignIn googleSignIn = GoogleSignIn();
@@ -43,7 +42,7 @@ class _LoginScreen extends State<LoginScreen> {
     if (box.read("logged_in") != null && box.read("logged_in") == true) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         // Add Your Code here.
-        Get.to(TrendHome());
+        Get.to(App());
         //this.dispose();
         return;
       });
@@ -133,15 +132,18 @@ class _LoginScreen extends State<LoginScreen> {
                     })),
               ),
 
-              Align(
-                alignment: Alignment.topCenter,
-                child: SizedBox(
-                  child: Container(
-                      child: Image.asset(
-                    'assets/logo/logo.png',
-                    fit: BoxFit.fill,
-                    width: 250,
-                  )),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 60.0),
+                child: Align(
+                  alignment: Alignment.center,
+                  child: SizedBox(
+                    child: Container(
+                        child: Image.asset(
+                      'assets/logo/logo.png',
+                      fit: BoxFit.fill,
+                      width: 200,
+                    )),
+                  ),
                 ),
               ),
               Align(

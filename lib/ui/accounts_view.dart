@@ -1,6 +1,7 @@
 import 'package:Trend/agreedTermsOfUse.dart';
 import 'package:Trend/data/streaminfo.dart';
 import 'package:Trend/login.dart';
+import 'package:Trend/screens/Auth/LoginScreen.dart';
 import 'package:Trend/ui/transitions.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:custom_switch/custom_switch.dart';
@@ -9,10 +10,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+
 
 import '../TermsAndConditions.dart';
-import 'package:Trend/ui/manage_account.dart';
 
 import 'package:Trend/trend_icons_icons.dart' as Trend;
 
@@ -24,7 +24,7 @@ class AccountView extends StatefulWidget {
 class _AccountViewState extends State<AccountView> {
   StreamInfo info = Get.find();
   GetStorage box = GetStorage();
-  final GoogleSignIn googleSignIn = GoogleSignIn();
+  //final GoogleSignIn googleSignIn = GoogleSignIn();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   Future<void> send() async {
@@ -57,25 +57,7 @@ class _AccountViewState extends State<AccountView> {
   }
 
   Future<void> _logout() async {
-    if (box.read("loggin_type") == "GOOGLE") {
-      googleSignIn.signOut().then((value) {
-        box.write("logged_in", false).then((value) {
-          Get.to(LoginScreen()).then((value) {
-            box.remove("logged_in");
-            box.remove("username");
-            box.remove("firstname");
-            box.remove("lastname");
-            box.remove("logged_in");
-            box.remove("email");
-            box.remove("photoUrl");
-            box.remove("loggin_type");
-            box.write("logged_in", false);
-            box.write("ts_agreed", false);
-          });
-        });
-      });
-    } else {
-      await FirebaseAuth.instance.signOut().then((value) => {
+    FirebaseAuth.instance.signOut().then((value) => {
             box.write("ts_agreed", false),
             box.write("logged_in", false).then((value) {
               Get.to(LoginScreen()).then((value) {
@@ -93,8 +75,7 @@ class _AccountViewState extends State<AccountView> {
             })
           });
     }
-  }
-
+  
   @override
   Widget build(BuildContext context) {
     // String _text = authState.getDisplayName;
@@ -426,4 +407,5 @@ class _AccountViewState extends State<AccountView> {
 //   ),
 // ),
   }
+
 }

@@ -1,5 +1,4 @@
-import 'package:Trend/TrendHome.dart';
-import 'package:Trend/login.dart';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -8,10 +7,9 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 //import 'package:get_storage/get_storage.dart';
 
-import 'package:webview_flutter/webview_flutter.dart';
-import 'package:webview_flutter_plus/webview_flutter_plus.dart';
+
 import 'package:flutter/services.dart' show rootBundle;
-import 'data/streaminfo.dart';
+
 
 class AgreedConditions extends StatefulWidget {
   AgreedConditions({Key key}) : super(key: key);
@@ -24,8 +22,8 @@ class _AgreedConditions extends State<AgreedConditions> {
   GetStorage box = GetStorage();
   String termsOfUse;
 
-  double _height = 1;
-  final _key = UniqueKey();
+
+
 
   @override
   void initState() {
@@ -46,34 +44,7 @@ class _AgreedConditions extends State<AgreedConditions> {
     return await rootBundle.loadString('assets/terms/termsofuse.txt');
   }
 
-  Container _closeButton({Color color, String label}) {
-    return Container(
-      height: 46,
-      width: Get.width,
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.all(
-            Radius.circular(10),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.010),
-              spreadRadius: 5,
-              blurRadius: 7,
-              offset: Offset(0, 3),
-            ),
-          ],
-          color: color),
-      child: Center(
-          child: Text(
-        label,
-        style: TextStyle(
-            color: Color(0xff262626),
-            fontSize: 16,
-            fontWeight: FontWeight.bold),
-      )),
-    );
-  }
-
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(

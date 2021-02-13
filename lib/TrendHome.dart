@@ -1,5 +1,5 @@
-import 'package:Trend/screens/home_screen.dart';
-import 'package:Trend/settings.dart';
+import 'package:Trend/screens/HomeScreen/home_screen.dart';
+
 import 'package:Trend/ui/accounts_view.dart' hide TrendIcons;
 import 'package:Trend/ui/transitions.dart';
 import 'package:flutter/material.dart';
@@ -8,12 +8,14 @@ import 'package:get/route_manager.dart';
 import 'package:Trend/trend_icons_icons.dart';
 import 'package:rate_my_app/rate_my_app.dart';
 
-class TrendHome extends StatefulWidget {
+import 'screens/SearchScreen/search_screen.dart';
+
+class App extends StatefulWidget {
   @override
-  _TrendHomeState createState() => _TrendHomeState();
+  _AppState createState() => _AppState();
 }
 
-class _TrendHomeState extends State<TrendHome> {
+class _AppState extends State<App> {
   RateMyApp rateMyApp = RateMyApp(
     preferencesPrefix: 'rateMyApp_',
     minDays: 0, // Show rate popup on first day of install.
@@ -97,9 +99,8 @@ class _TrendHomeState extends State<TrendHome> {
                       children: [
                         IconButton(
                           onPressed: () {
-                            Navigator.of(context)
-                                .push(Transitions.createRoute(Settings()));
                             //Get.to( Settings());
+                            Get.to(SearchScreen());
                           },
                           icon: Icon(
                             TrendIcons.search,

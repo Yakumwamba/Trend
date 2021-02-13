@@ -8,8 +8,6 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 //import 'package:get_storage/get_storage.dart';
 
-import 'package:webview_flutter/webview_flutter.dart';
-import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'data/streaminfo.dart';
 
@@ -25,7 +23,7 @@ class _TermsAndConditions extends State<TermsAndConditions> {
   StreamInfo info = Get.find();
   GetStorage box = GetStorage();
   String termsOfUse;
-  WebViewPlusController _controller;
+
   double _height = 1;
   final _key = UniqueKey();
 
@@ -100,13 +98,13 @@ class _TermsAndConditions extends State<TermsAndConditions> {
           InkWell(
               onTap: () {
                 box.write("ts_agreed", true);
-                Get.to(TrendHome());
+                Get.to(App());
               },
               child: _closeButton(label: "Yes", color: Color(0xfff79f00))),
           InkWell(
             onTap: () {
               box.write("ts_agreed", false);
-              Get.to(LoginScreen());
+            //  Get.to(LoginScreen());
             },
             child: Padding(
               padding: const EdgeInsets.only(bottom: 35.0, top: 5),
